@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: xwiki-rc
+spec:
+  replicas: 1
+  selector:
+    app: xwiki-label
+  template:
+    metadata:
+      labels:
+        app: xwiki-label
+    spec:
+      containers:
+        -
+          env:
+            -
+              name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DB_DATABASE
+                  name: db-secret
+            -
+              name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: DB_HOST
+                  name: db-secret
+            -
+              name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: db-secret
+            -
+              name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USER
+                  name: db-secret
+          image: vivianemaker1/santander-xwiki:latest
+          name: xwiki-container
+          ports:
+            - 
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            -
+              mountPath: /usr/local/xwiki
+              name: xwiki-volume
+      volumes:
+        -
+          name: xwiki-volume
+          persistentVolumeClaim: 
+            claimName: xwiki-pvc
+            readOnly: false
